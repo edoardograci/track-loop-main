@@ -171,15 +171,18 @@ export function setupPlayControls() {
     }
 }
 
-function updatePlayPauseButton() {
-    const playPauseButton = document.getElementById('playPauseButton');
-    if (playPauseButton) {
-        if (masterWaveSurfer.isPlaying()) {
-            playPauseButton.innerHTML = '<i class="fas fa-pause"></i>';
-        } else {
-            playPauseButton.innerHTML = '<i class="fas fa-play"></i>';
+let audioContext;
+
+export function getAudioContext() {
+    if (!audioContext) {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log('AudioContext created successfully');
+        } catch (error) {
+            console.error('Failed to create AudioContext:', error.name, error.message);
         }
     }
+    return audioContext;
 }
 
 export function playMaster() {

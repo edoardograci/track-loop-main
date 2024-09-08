@@ -1,4 +1,4 @@
-import { startRecording, stopRecording, getIsRecording } from './audioRecorder.js';
+import { startRecording, stopRecording, getIsRecording, setUpdateUICallback } from './audioRecorder.js';
 import { playMaster, stopMaster, addTrackToMaster, setupPlayControls } from './timeline.js';
 import { masterWaveSurfer } from './timeline.js';
 import { playAudioBuffer, stopAudioBuffer } from './audioPlayer.js';  // You'll need to create this file
@@ -23,15 +23,26 @@ export function setupUI() {
     playControlsContainer.appendChild(stopMasterButton);
 
     if (startStopButton) {
-        startStopButton.addEventListener('click', () => {
-            if (getIsRecording()) {
-                stopRecording();
-                recordingStatus.style.display = 'none';
+        startStopButton.addEventListener('click', async () => {
+            try {
+                if (getIsRecording()) {
+                    // Immediately update the UI
+                    startStopButton.textContent = 'Start Recording';
+                    recordingStatus.style.display = 'none';
+                    // Then stop the recording and show loading
+                    await stopRecording();
+                    showLoadingIndicator();
+                } else {
+                    // Update UI before starting recording
+                    startStopButton.textContent = 'Stop Recording';
+                    recordingStatus.style.display = 'inline';
+                    await startRecording();
+                }
+            } catch (error) {
+                console.error('Error during recording operation:', error.name, error.message);
                 startStopButton.textContent = 'Start Recording';
-            } else {
-                startRecording();
-                recordingStatus.style.display = 'inline';
-                startStopButton.textContent = 'Stop Recording';
+                recordingStatus.style.display = 'none';
+                alert(`An error occurred while trying to record: ${error.message}. Please try again.`);
             }
         });
     } else {
@@ -51,6 +62,17 @@ export function setupUI() {
 
     // Add this function to handle adding tracks to the master
     window.addTrackToMaster = addTrackToMaster;
+
+    // Use the existing setUpdateUICallback function
+    setUpdateUICallback((state) => {
+        if (state === 'recording') {
+            startStopButton.textContent = 'Stop Recording';
+            recordingStatus.style.display = 'inline';
+        } else if (state === 'stopped') {
+            startStopButton.textContent = 'Start Recording';
+            recordingStatus.style.display = 'none';
+        }
+    });
 }
 
 function hideTrackAcceptanceModal() {
@@ -125,3 +147,55 @@ export function showTrackAcceptanceModal(fileName) {
 document.addEventListener('DOMContentLoaded', () => {
     setupUI();
 });
+
+export function showLoadingIndicator() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const startStopButton = document.getElementById('startStopButton');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'block';
+    }
+    if (startStopButton) {
+        startStopButton.textContent = 'Start Recording';
+    }
+    // Ensure the recording status is hidden when showing the loading indicator
+    const recordingStatus = document.getElementById('recordingStatus');
+    if (recordingStatus) {
+        recordingStatus.style.display = 'none';
+    }
+}
+
+function updateUIForStoppedRecording() {
+    const startStopButton = document.getElementById('startStopButton');
+    const recordingStatus = document.getElementById('recordingStatus');
+    startStopButton.textContent = 'Start Recording';
+    recordingStatus.style.display = 'none';
+    showLoadingIndicator();
+}
+
+function updateUIForStartedRecording() {
+    const startStopButton = document.getElementById('startStopButton');
+    const recordingStatus = document.getElementById('recordingStatus');
+    startStopButton.textContent = 'Stop Recording';
+    recordingStatus.style.display = 'inline';
+}
+
+export function hideLoadingIndicator() {
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const loadingBar = document.getElementById('loadingBar');
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
+    if (loadingBar) loadingBar.style.width = '0%';
+    // Don't change the start/stop button text here
+}
+
+export function updateLoadingProgress(progress, status) {
+    const loadingBar = document.getElementById('loadingBar');
+    const loadingStatus = document.getElementById('loadingStatus');
+    if (loadingBar) {
+        loadingBar.style.width = `${progress}%`;
+    }
+    if (loadingStatus) {
+        loadingStatus.textContent = status;
+        loadingStatus.style.display = 'block'; // Ensure the status is visible
+    }
+    console.log(`Loading progress: ${progress}%, Status: ${status}`); // For debugging
+}

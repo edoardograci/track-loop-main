@@ -29,8 +29,13 @@
                             <p>RECORDING</p>
                             <div class="pulse"></div>
                         </div>
-                        <div id="loadingIndicator" style="display: none; width: 100%; height: 20px; background-color: #f0f0f0; border: 1px solid #ccc; margin-top: 10px;">
-                            <div id="loadingBar" style="width: 0%; height: 100%; background-color: #4CAF50; transition: width 0.3s;"></div>
+                        <div id="loadingIndicator" style="display: none;">
+                            <div>
+                                <div id="loadingBarContainer">
+                                    <div id="loadingBar"></div>
+                                </div>
+                                <div id="loadingStatus">Initializing...</div>
+                            </div>
                         </div>
                     </div>
                     <div id="two">

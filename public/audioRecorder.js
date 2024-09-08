@@ -1,30 +1,33 @@
 import { sendAudioForProcessing } from './audioProcessor.js';
+import { getAudioContext } from './timeline.js';
 
 let mediaRecorder;
 let isRecording = false;
 let audioChunks = [];
+let audioContext;
+let updateUICallback = () => {}; // Initialize with an empty function
 
 export function setupAudioRecorder() {
-    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        const audioContext = new AudioContextClass();
-        // Use audioContext as needed
-    } else {
-        console.error('Web Audio API is not supported in this browser');
-    }
+    // Don't create AudioContext here, we'll do it on user interaction
     console.log('Audio Recorder setup complete');
+}
+
+export function setUpdateUICallback(callback) {
+    updateUICallback = callback;
 }
 
 export function startRecording() {
     return new Promise((resolve, reject) => {
-        if (isRecording) {
-            console.log('Already recording');
-            resolve();
+        const audioContext = getAudioContext();
+        if (!audioContext) {
+            console.error('AudioContext could not be created');
+            reject(new Error('AudioContext could not be created'));
             return;
         }
-        
+
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
+                console.log('Media stream created successfully');
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.ondataavailable = (event) => {
                     audioChunks.push(event.data);
@@ -33,7 +36,16 @@ export function startRecording() {
                     if (audioChunks.length > 0) {
                         const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
                         audioChunks = [];
-                        await sendAudioForProcessing(audioBlob);
+                        updateUICallback('recording');
+                        try {
+                            await sendAudioForProcessing(audioBlob);
+                            updateUICallback('stopped');
+                        } catch (error) {
+                            console.error('Error processing audio:', error);
+                            updateUICallback('stopped');
+                        } finally {
+                            updateUICallback('stopped');
+                        }
                     } else {
                         console.warn('No audio data recorded');
                     }
@@ -45,19 +57,25 @@ export function startRecording() {
                 resolve();
             })
             .catch(error => {
-                console.error('Error accessing media devices.', error);
+                console.error('Error accessing media devices:', error.name, error.message);
                 reject(error);
             });
     });
 }
 
 export function stopRecording() {
-    if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-        console.log('Recording stopped');
-    } else {
-        console.error('MediaRecorder is not initialized or not recording.');
-    }
+    return new Promise((resolve, reject) => {
+        if (mediaRecorder && isRecording) {
+            mediaRecorder.stop();
+            console.log('Recording stopped');
+            // The actual resolution of the promise will happen in the onstop event
+            updateUICallback('stopped');
+            // Then start your audio processing
+        } else {
+            console.error('MediaRecorder is not initialized or not recording.');
+            reject(new Error('Not recording'));
+        }
+    });
 }
 
 export function getIsRecording() {

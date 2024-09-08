@@ -6,10 +6,10 @@ import { initializeMasterTrack, setupPlayControls } from './timeline.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, setting up application...');
+    setupUI();
     setupAudioRecorder();
     setupAudioProcessor();
     setupTimeline();
-    setupUI();
     initializeMasterTrack();
     setupPlayControls();
 });

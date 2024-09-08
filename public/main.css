@@ -232,7 +232,7 @@ svg{
     margin-bottom: 3.2rem;
     display: flex;
 }
-/*colore rosso:  #f97068*/
+
 .audioResult p{
     width: 100%;
     outline: none;
@@ -299,22 +299,38 @@ h3{
 }
 
 #loadingIndicator {
-    position: relative;
+    display: none;
     width: 100%;
+    margin: 10px 0;
+}
+
+#loadingIndicator > div {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+#loadingBarContainer {
+    width: 200px;
     height: 20px;
     background-color: #f0f0f0;
     border: 1px solid #ccc;
-    margin-top: 10px;
+    border-radius: 10px;
     overflow: hidden;
 }
 
 #loadingBar {
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: 0%;
     height: 100%;
     background-color: #4CAF50;
-    transition: width 0.3s ease-in-out;
+    transition: width 0.3s;
+}
+
+#loadingStatus {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #333;
+    white-space: nowrap;
 }
 
 #processedTracks {
@@ -353,7 +369,7 @@ h3{
 #timeline {
     position: relative;
     width: 100%;
-    height: 300px; /* Adjust height as needed */
+    height: 300px;
     border: 1px solid #ccc;
     overflow: auto;
 }
@@ -361,7 +377,7 @@ h3{
 .timeline-row {
     position: relative;
     width: 100%;
-    height: 50px; /* Adjust height as needed */
+    height: 50px;
     border-bottom: 1px solid #eee;
 }
 
