@@ -112,6 +112,62 @@ svg{
     width: 32px;
 }
 
+#recording {
+    margin: 1.6rem 0;
+    display: flex;
+    height: 3.2rem;
+    align-items: center;
+    visibility: hidden;
+}
+#recording p{
+    margin-bottom: 0px;
+}
+
+.pulse {
+    margin-left: 1.6rem;
+    display: block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: #f97068;
+    cursor: pointer;
+    box-shadow: 0 0 0 rgba(#f96f6841);
+    animation: pulse 2s infinite;
+  }
+
+  .pulse:hover {
+    animation: none;
+  }
+  
+  @-webkit-keyframes pulse {
+    0% {
+      -webkit-box-shadow: 0 0 0 0 #f96f6841;
+    }
+    70% {
+        -webkit-box-shadow: 0 0 0 10px #f96f6800;
+    }
+    100% {
+        -webkit-box-shadow: 0 0 0 0 #f96f6800;
+    }
+  }
+  @keyframes pulse {
+    0% {
+      -moz-box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);
+      box-shadow: 0 0 0 0 rgba(204,169,44, 0.4);
+      transform: scale(1.0);
+    }
+    70% {
+        -moz-box-shadow: 0 0 0 10px rgba(204,169,44, 0);
+        box-shadow: 0 0 0 10px rgba(204,169,44, 0);
+        transform: scale(0.850);
+    }
+    100% {
+        -moz-box-shadow: 0 0 0 0 rgba(204,169,44, 0);
+        box-shadow: 0 0 0 0 rgba(204,169,44, 0);
+    }
+  }
+
+
 .icon{
     background-color: #2b44ff;
     color: #fff;
@@ -256,6 +312,7 @@ h3{
     max-width: 80%;
     max-height: 80%;
     overflow: auto;
+    min-width: 300px;
 }
 
 .modal-overlay {
@@ -269,4 +326,59 @@ h3{
     justify-content: center;
     align-items: center;
     z-index: 9999;
+}
+
+#trackAcceptanceModal .play-button,
+#trackAcceptanceModal .reject-button,
+#trackAcceptanceModal .accept-button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 0 10px;
+}
+
+#trackAcceptanceModal .play-button {
+    background-color: #4CAF50;
+}
+
+#trackAcceptanceModal .reject-button {
+    background-color: #f44336;
+}
+
+#trackAcceptanceModal .accept-button {
+    background-color: #4CAF50;
+}
+
+#trackAcceptanceModal .play-button i,
+#trackAcceptanceModal .reject-button i,
+#trackAcceptanceModal .accept-button i {
+    font-size: 24px;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.timeline-track {
+    position: relative;
+    height: 100px;
+    margin-bottom: 10px;
+    overflow: hidden;
 }

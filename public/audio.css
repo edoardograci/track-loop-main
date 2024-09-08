@@ -133,22 +133,33 @@
 .track-preview {
     display: flex;
     align-items: center;
-    margin: 20px 0;
+    gap: 20px;
 }
 
 .play-button {
+    width: 48px;
+    height: 48px;
     background-color: #4CAF50;
     border: none;
     color: white;
-    padding: 10px;
     border-radius: 50%;
     cursor: pointer;
-    margin-right: 10px;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    margin-right: 20px;
+}
+
+.play-button i {
+    font-size: 24px;
 }
 
 .waveform {
     flex-grow: 1;
     height: 100px;
+    min-width: 0;
 }
 
 .action-buttons {
@@ -158,11 +169,16 @@
 }
 
 .reject-button, .accept-button {
+    width: 48px;
+    height: 48px;
     border: none;
     color: white;
-    padding: 10px;
     border-radius: 50%;
     cursor: pointer;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .reject-button {
@@ -171,6 +187,10 @@
 
 .accept-button {
     background-color: #4CAF50;
+}
+
+.reject-button i, .accept-button i {
+    font-size: 24px;
 }
 
 .loading-bar-container {
