@@ -5,6 +5,13 @@ let isRecording = false;
 let audioChunks = [];
 
 export function setupAudioRecorder() {
+    if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContextClass();
+        // Use audioContext as needed
+    } else {
+        console.error('Web Audio API is not supported in this browser');
+    }
     console.log('Audio Recorder setup complete');
 }
 
@@ -23,9 +30,13 @@ export function startRecording() {
                     audioChunks.push(event.data);
                 };
                 mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    audioChunks = [];
-                    await sendAudioForProcessing(audioBlob);
+                    if (audioChunks.length > 0) {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        audioChunks = [];
+                        await sendAudioForProcessing(audioBlob);
+                    } else {
+                        console.warn('No audio data recorded');
+                    }
                     isRecording = false;
                 };
                 mediaRecorder.start();
