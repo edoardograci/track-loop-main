@@ -30,27 +30,34 @@ function formatTime(seconds) {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-export function addTrackToTimeline(audioBuffer, fileName) {
+export function addTrackToTimeline(audioBuffer, fileName, selectedInstrument) {
     if (!audioBuffer || !isValidAudioBuffer(audioBuffer)) {
         console.error('Invalid audio buffer:', audioBuffer);
         return;
     }
 
-    const trackElement = createTrackElement(audioBuffer, fileName);
-    if (!trackElement) {
-        console.error('Failed to create track element');
-        return;
-    }
-
+    const trackElement = createTrackElement(audioBuffer, fileName, selectedInstrument); // Use the passed instrument
     const timeline = document.getElementById('timeline');
     timeline.appendChild(trackElement);
     updateMasterTrack();
 }
 
-function createTrackElement(audioBuffer, fileName) {
+function createTrackElement(audioBuffer, fileName, selectedInstrument) {
     const trackElement = document.createElement('div');
     trackElement.className = 'timeline-track';
+
+    const instrumentSelect = document.createElement('select');
+    instrumentSelect.id = `instrumentSelect-${fileName}`;
+    instrumentSelect.innerHTML = `
+        <option value="Piano" ${selectedInstrument === "Piano" ? "selected" : ""}>Piano</option>
+        <option value="Guitar" ${selectedInstrument === "Guitar" ? "selected" : ""}>Guitar</option>
+        <option value="Bass" ${selectedInstrument === "Bass" ? "selected" : ""}>Bass</option>
+        <option value="Violin" ${selectedInstrument === "Violin" ? "selected" : ""}>Violin</option>
+        <option value="Voice" ${selectedInstrument === "Voice" ? "selected" : ""}>Voice</option>
+    `;
     
+    trackElement.appendChild(instrumentSelect);
+
     const waveformContainer = document.createElement('div');
     trackElement.appendChild(waveformContainer);
 
@@ -83,6 +90,11 @@ function createTrackElement(audioBuffer, fileName) {
     trackElement.wavesurfer = wavesurfer;
     trackElement.fileName = fileName;
 
+    instrumentSelect.addEventListener('change', (event) => {
+        const selectedInstrument = event.target.value;
+        console.log(`Instrument for ${fileName} changed to ${selectedInstrument}`);
+    });
+
     return trackElement;
 }
 
@@ -104,7 +116,7 @@ function updateMasterTrack() {
     }
 }
 
-export function addTrackToMaster(fileName) {
+export function addTrackToMaster(fileName, selectedInstrument) {
     if (!masterWaveSurfer) {
         initializeMasterTrack();
     }
@@ -112,7 +124,7 @@ export function addTrackToMaster(fileName) {
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => masterContext.decodeAudioData(arrayBuffer))
         .then(audioBuffer => {
-            addTrackToTimeline(audioBuffer, fileName);
+            addTrackToTimeline(audioBuffer, fileName, selectedInstrument); // Pass the selected instrument
         })
         .catch(error => console.error('Error loading audio file:', error));
 }

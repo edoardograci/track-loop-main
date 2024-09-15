@@ -5,10 +5,9 @@ let mediaRecorder;
 let isRecording = false;
 let audioChunks = [];
 let audioContext;
-let updateUICallback = () => {}; // Initialize with an empty function
+let updateUICallback = () => {};
 
 export function setupAudioRecorder() {
-    // Don't create AudioContext here, we'll do it on user interaction
     console.log('Audio Recorder setup complete');
 }
 
@@ -19,6 +18,7 @@ export function setUpdateUICallback(callback) {
 export function startRecording() {
     return new Promise((resolve, reject) => {
         const audioContext = getAudioContext();
+        const selectedInstrument = document.getElementById('instrumentSelect').value;
         if (!audioContext) {
             console.error('AudioContext could not be created');
             reject(new Error('AudioContext could not be created'));
@@ -38,7 +38,7 @@ export function startRecording() {
                         audioChunks = [];
                         updateUICallback('recording');
                         try {
-                            await sendAudioForProcessing(audioBlob);
+                            await sendAudioForProcessing(audioBlob, selectedInstrument);
                             updateUICallback('stopped');
                         } catch (error) {
                             console.error('Error processing audio:', error);
@@ -68,9 +68,7 @@ export function stopRecording() {
         if (mediaRecorder && isRecording) {
             mediaRecorder.stop();
             console.log('Recording stopped');
-            // The actual resolution of the promise will happen in the onstop event
             updateUICallback('stopped');
-            // Then start your audio processing
         } else {
             console.error('MediaRecorder is not initialized or not recording.');
             reject(new Error('Not recording'));

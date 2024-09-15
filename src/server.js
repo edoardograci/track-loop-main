@@ -74,7 +74,9 @@ app.post('/upload', upload.single('audio'), (req, res) => {
 
         const inputPath = req.file.path;
         const outputPath = path.join(__dirname, 'uploads', `converted_${req.file.filename}.wav`);
+        const selectedInstrument = req.body.instrument;
 
+        console.log(`Selected instrument: ${selectedInstrument}`);
         console.log(`Processing file: ${inputPath}`);
         console.log(`Output will be saved to: ${outputPath}`);
 
@@ -86,7 +88,7 @@ app.post('/upload', upload.single('audio'), (req, res) => {
             return res.status(500).json({ error: 'Python script not found', scriptPath: pythonScriptPath });
         }
 
-        exec(`"python" "${pythonScriptPath}" "${inputPath}" "${outputPath}"`, (error, stdout, stderr) => {
+        exec(`"python" "${pythonScriptPath}" "${inputPath}" "${outputPath}" "${selectedInstrument}"`, (error, stdout, stderr) => {
             console.log('Python script execution completed');
             console.log(`Python script path: ${pythonScriptPath}`);
             console.log(`Input path: ${inputPath}`);

@@ -8,13 +8,14 @@ export function setupAudioProcessor() {
     console.log('Audio Processor setup complete');
 }
 
-export async function sendAudioForProcessing(audioBlob) {
+export async function sendAudioForProcessing(audioBlob, selectedInstrument) {
     showLoadingIndicator();
     updateLoadingProgress(0, "Initializing...");
     try {
         updateLoadingProgress(25, "Analyzing audio...");
         const formData = new FormData();
         formData.append('audio', audioBlob, 'audio.webm');
+        formData.append('instrument', selectedInstrument);
         
         const response = await fetch('/upload', {
             method: 'POST',
@@ -43,7 +44,11 @@ export async function sendAudioForProcessing(audioBlob) {
         
         if (result.message === 'File processed successfully') {
             console.log('Showing modal for file:', result.convertedFile);
-            showTrackAcceptanceModal(result.convertedFile);
+            // Show the modal and wait for user confirmation
+            const userConfirmed = await showTrackAcceptanceModal(result.convertedFile, selectedInstrument);
+            if (userConfirmed) {
+                addTrackToMaster(result.convertedFile, selectedInstrument); // Only add track if confirmed
+            }
         }
         
         return result;

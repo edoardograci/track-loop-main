@@ -100,12 +100,10 @@ def voice_to_midi(input_file, output_midi):
         logging.error(traceback.format_exc())
         raise  # Re-raise the exception after logging
 
-def midi_to_audio(midi_file, output_audio_file):
+def midi_to_audio(midi_file, output_audio_file, soundfont_path):
     """Convert MIDI file to audio using FluidSynth."""
     try:
         print(f"Converting MIDI to audio using FluidSynth...")
-        
-        soundfont_path = os.path.abspath('./soundFont/Essential Keys-sfzBanks-v9.6.sf2')
         
         midi_file = os.path.abspath(midi_file)
         output_audio_file = os.path.abspath(output_audio_file)
@@ -138,7 +136,19 @@ def midi_to_audio(midi_file, output_audio_file):
         traceback.print_exc()
         raise
 
-def main(input_file, output_file):
+def get_soundfont_path(instrument):
+    """Map instrument names to soundfont file paths."""
+    soundfont_map = {
+        "Piano": './soundFont/Essential Keys-sfzBanks-v9.6.sf2',
+        "Guitar": './soundFont/East_West_-_Steve_Stevens_Guitar_Samples_Collection.sf2',
+        "Bass": './soundFont/Nice-Bass-Plus-Drums-v5.3.sf2',
+        "Violin": './soundFont/Strings-4U-v1.0.sf2',
+        "Voice": './soundFont/KBH-Real-Choir-V2.5.sf2',
+        # Add more mappings as needed
+    }
+    return soundfont_map.get(instrument, soundfont_map["Piano"])
+
+def main(input_file, output_file, instrument):
     logging.info(f"Starting conversion process...")
     logging.info(f"Input file: {input_file}")
     logging.info(f"Output file: {output_file}")
@@ -159,7 +169,7 @@ def main(input_file, output_file):
         logging.info("Converting MIDI to audio...")
         # Ensure the output directory exists
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        midi_to_audio(temp_midi, output_file)
+        midi_to_audio(temp_midi, output_file, get_soundfont_path(instrument))
         logging.info("Audio conversion complete.")
         
         if os.path.exists(output_file):
@@ -181,15 +191,16 @@ def main(input_file, output_file):
                     logging.error(f"Error removing temporary file {temp_file}: {str(e)}")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        logging.error("Usage: python convertAudio.py <input_file> <output_file>")
+    if len(sys.argv) != 4:
+        logging.error("Usage: python convertAudio.py <input_file> <output_file> <instrument>")
         sys.exit(1)
 
     input_file = sys.argv[1]
     output_file = sys.argv[2]
+    instrument = sys.argv[3]
 
     try:
-        main(input_file, output_file)
+        main(input_file, output_file, instrument)
     except Exception as e:
         logging.error(f"Error in main: {str(e)}")
         sys.exit(1)
